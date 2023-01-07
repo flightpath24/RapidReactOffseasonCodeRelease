@@ -9,10 +9,11 @@ import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.math.geometry.*;
+//import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.*;
 
-/** An example command that uses an example subsystem. */
+/** A PIDDriveCommand command that uses a drivetrain subsystem. */
 public class PIDDriveCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Drivetrain m_drivetrain;
@@ -21,6 +22,10 @@ public class PIDDriveCommand extends CommandBase {
   private final Joystick rightJoystick;
 
   private final JoystickFilter forwardFilter, turnFilter;
+
+  private final ShuffleboardTab driveTab;
+
+  final SimpleWidget driveHeadingWidget;
 
   /**
    * Creates a new ExampleCommand.
@@ -38,6 +43,9 @@ public class PIDDriveCommand extends CommandBase {
     forwardFilter = new JoystickFilter(0.1, 0.8);
     turnFilter = new JoystickFilter(0.1, 0.5);
 
+    driveTab = Shuffleboard.getTab("Driver Tab");
+    driveHeadingWidget = driveTab.add("Drive Heading", 0.0).withPosition(2, 2).withSize(2, 2).withWidget("Gyro");
+
   }
 
   // Called when the command is initially scheduled.
@@ -45,9 +53,6 @@ public class PIDDriveCommand extends CommandBase {
   public void initialize() {
 
     m_drivetrain.setPIDF(.17, .000002, .12, .62);
-
-    //Resets gyro heading, encoder positions, and pose reading
-    m_drivetrain.resetOdometry(new Pose2d(0.0, 0.0, new Rotation2d()));
 
   }
 
@@ -59,19 +64,21 @@ public class PIDDriveCommand extends CommandBase {
     double forwardSpeed = forwardFilter.filter(leftJoystick.getY());
     double turnSpeed = turnFilter.filter(rightJoystick.getX());
 
-    m_drivetrain.PIDArcadeDrive(forwardSpeed * 2.5, turnSpeed * 3);
+    m_drivetrain.PIDArcadeDrive(forwardSpeed * 3.5, turnSpeed * 3);
 
     //Updates the odometry with a new estimated robot pose
-    m_drivetrain.updateOdometry();
+    //m_drivetrain.updateOdometry();
 
     //Prints out the estimated robot pose
-    System.out.println(m_drivetrain.updateOdometry());
+    //System.out.println(m_drivetrain.updateOdometry());
 
     //Prints out the rotation 2d heading
     SmartDashboard.putNumber("Drivetrain Heading:", m_drivetrain.getHeading());
 
+    driveHeadingWidget.getEntry().setDouble(m_drivetrain.getHeading());
+
     //Prints out gyro turn rate
-    SmartDashboard.putNumber("Drivetrain Turn Rate:", m_drivetrain.getTurnRate());
+    SmartDashboard.putNumber("Drivetrain Turn Rate:", m_drivetrain.getTurnRate());    
 
     //Prints out left side velocity
     SmartDashboard.putNumber("Left Side Velocity:", m_drivetrain.getAverageLeftEncoderVelocity());

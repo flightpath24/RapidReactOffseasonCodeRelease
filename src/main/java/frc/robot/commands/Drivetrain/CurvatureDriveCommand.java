@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Joystick;
 //import edu.wpi.first.wpilibj.smartdashboard.*;
 
 /** An example command that uses an example subsystem. */
-public class DrivetrainCommand extends CommandBase {
+public class CurvatureDriveCommand extends CommandBase {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   private final Drivetrain m_drivetrain;
 
@@ -29,7 +29,7 @@ public class DrivetrainCommand extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public DrivetrainCommand(Drivetrain drivetrain, Joystick leftJoystick, Joystick rightJoystick) {
+  public CurvatureDriveCommand(Drivetrain drivetrain, Joystick leftJoystick, Joystick rightJoystick) {
     this.m_drivetrain = drivetrain;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
@@ -37,8 +37,8 @@ public class DrivetrainCommand extends CommandBase {
     this.leftJoystick = leftJoystick;
     this.rightJoystick = rightJoystick;
 
-    forwardFilter = new JoystickFilter(0.07, 0.3);
-    turnFilter = new JoystickFilter(0.07, 0.3);
+    forwardFilter = new JoystickFilter(0.1, 0.3);
+    turnFilter = new JoystickFilter(0.1, 0.3);
 
   }
 
@@ -59,7 +59,7 @@ public class DrivetrainCommand extends CommandBase {
     double forwardSpeed = forwardFilter.filter(leftJoystick.getY());
     double turnSpeed = turnFilter.filter(rightJoystick.getX());
 
-    m_drivetrain.ArcadeDrive(forwardSpeed, turnSpeed);
+    m_drivetrain.curvatureDrive(forwardSpeed, turnSpeed);
 
     // Updates the odometry with a new estimated robot pose
     m_drivetrain.updateOdometry();
@@ -88,7 +88,7 @@ public class DrivetrainCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
 
-    m_drivetrain.ArcadeDrive(0, 0);
+    m_drivetrain.curvatureDrive(0, 0);
 
   }
 
